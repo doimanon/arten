@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>var socket = io();</script>
+    <script>
+        function clear(){
+
+        }
+        function sendData(){
+            var artenname = document.getElementById('artenname').value
+            var anzahlg = document.getElementById('anzahlg').value
+            var anzahla = document.getElementById('anzahla').value
+            var entwick = document.getElementById('entwick').value
+            var lort = document.getElementById('lort').value
+            var erhaltena = document.getElementById('erhaltena').value
+            var idaus = document.getElementById('idaus').value
+
+            socket.emit('csv_eintrag',{
+                artenname: artenname,
+                anzahlg: anzahlg,
+                anzahla: anzahla,
+                entwick: entwick,
+                lort: lort,
+                erhaltena: erhaltena,
+                idaus: idaus
+            })
+        }
+        function getDataById(){
+            var id = document.getElementById('id').value
+            socket.emit('csv_auslesen_byID',id)
+        }
+        function verkauft(){
+            var datum = document.getElementById('vam').value
+            var id = document.getElementById('id_vam').value
+            socket.emit('verkauft',{id:id,datum:datum})
+
+        }
+        
+
+
+        socket.on('höchste_id',data=>{
+            document.getElementById('id_number_length').innerHTML = parseInt(data.id_)-1
+        })
+        socket.on('csv_line_array',data=>{
+            //var tag = document.createElement("p")
+            //var text = document.createTextNode(data.array.toString())
+            //tag.appendChild(text)
+            //document.getElementById('abfrage').appendChild(tag)
+            document.getElementById('abfrage').innerHTML = data.array.toString()
+        })
+
+        onpageload()
+        function onpageload(){
+            var url = window.location.href
+            var data = url.split('search')
+            var id = data[1].slice(1)
+            socket.emit('csv_auslesen_byID',id)
+        }
+    </script>
+
+
+</head>
+<body>
+<input type="button" value="CSV Auslesen" onclick="socket.emit('csv_auslesen')">
+
+<div id="abfrage">
+
+</div>
+
+<h1 style="color: #5e9ca0;">Verwaltungssoftware von pro-formica.de</h1>
+
+<p id='id_number_length'>letze ID Nummer:</p>
+
+<p>&nbsp;</p>
+<h2 style="color: #2e6c80;"><span style="color: #008080;">Eintragen von Kolonien:</span></h2>
+<p><label for="artenname">Artenname: <input id="artenname" name="artenname" type="text" /> </label></p>
+<p><label for="anzahlg">Anzahl Gynen: <input id="anzahlg" name="anzahlg" type="text" /> </label></p>
+<p><label for="anzahla">Anzahl Arbeiterinnen: <input id="anzahla" name="anzahla" type="text" /> </label></p>
+<p><label for="entwick">Kolonieentwicklung: <input id="entwick" name="entwick" type="text" /> </label></p>
+<p><label for="lort">Lagerort: <input id="lort" name="lort" type="text" /> </label></p>
+<p><label for="erhaltena">Erhalten am: <input id="erhaltena" name="erhaltena" type="text" /> </label></p>
+<p><label for="idaus">ID-Nummer: <input id="idaus" name="idaus" type="text" /> </label></p>
+<input type="button" value="EINGABE" onclick="sendData()">
+
+
+
+<h2>&nbsp;</h2>
+<h2><span style="color: #008080;">Kolonie-Daten auslesen:</span></h2>
+<p><span style="color: #008080;"><label for="id">ID-Nummer: <input id="id" name="id" type="text" /></label></span></p>
+<input type="button" value="ID SUCHEN:::" onclick="getDataById()">
+
+
+
+</body>
+</html>
